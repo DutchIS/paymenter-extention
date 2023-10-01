@@ -55,8 +55,7 @@ class DutchIS extends Server
                 'type' => 'title',
                 'friendlyName' => 'General',
                 'description' => 'General options',
-            ],
-            [
+            ], [
                 'name' => 'class',
                 'type' => 'dropdown',
                 'friendlyName' => 'Hardware Class',
@@ -72,38 +71,50 @@ class DutchIS extends Server
                         'value' => 'performance'
                     ]
                 ]
+            ], [
+                'name' => 'billing',
+                'type' => 'dropdown',
+                'friendlyName' => 'DutchIS billing cycle',
+                'required' => true,
+                'description' => 'The billing cycle you want to use on DutchIS. This is not your products billing cycle.',
+                'options' => [
+                    [
+                        'name' => 'Hourly billing (Pay afterwards)',
+                        'value' => 'hourly'
+                    ],
+                    [
+                        'name' => 'Monthly billing (Pay upfront)',
+                        'value' => 'monthly'
+                    ]
+                ]
             ],
 
             [
                 'type' => 'title',
                 'friendlyName' => 'Specifications',
                 'description' => 'Virtual server hardware specifications',
-            ],
-            [
+            ], [
                 'name' => 'vcores',
                 'type' => 'text',
                 'friendlyName' => 'vCores',
                 'required' => true,
                 'description' => 'The number of vcores of the virtual server',
                 'validation' => 'required|integer|min:1|max:16',
-            ],
-            [
+            ], [
                 'name' => 'memory',
                 'type' => 'text',
                 'friendlyName' => 'Memory (GB)',
                 'required' => true,
                 'description' => 'The amount of memory of the virtual server',
                 'validation' => 'required|integer|min:1|max:64',
-            ],
-            [
+            ], [
                 'name' => 'storage',
                 'type' => 'text',
                 'friendlyName' => 'Storage (GB)',
                 'required' => true,
                 'description' => 'The amount of storage of the virtual server',
                 'validation' => 'required|integer|min:20|max:1000',
-            ],
-            [
+            ], [
                 'name' => 'network',
                 'type' => 'text',
                 'friendlyName' => 'Network Speed (Gbps)',
@@ -127,32 +138,28 @@ class DutchIS extends Server
                 'description' => 'The hostname of your virtual server',
                 'validation' => 'required|max:50|alpha',
                 'required' => true,
-            ],
-            [
+            ], [
                 'name' => 'username',
                 'type' => 'text',
                 'friendlyName' => 'Username',
                 'description' => 'Your username which is used to login with.',
                 'validation' => 'required|string|min:4|max:50|alpha|not_in:root',
                 'required' => true,
-            ],
-            [
+            ], [
                 'name' => 'password',
                 'type' => 'password',
                 'friendlyName' => 'Password',
                 'description' => 'The password used for console/vnc access and remote desktop on windows servers.',
                 'validation' => 'required|string|min:8|max:50',
                 'required' => true,
-            ],
-            [
+            ], [
                 'name' => 'sshkey',
                 'type' => 'text',
                 'friendlyName' => 'SSH Key',
                 'description' => 'Used for SSH access on linux virtual servers.',
                 'validation' => 'required|string',
                 'required' => true,
-            ],
-            [
+            ], [
                 'name' => 'os',
                 'type' => 'dropdown',
                 'friendlyName' => 'Operating System',
@@ -199,6 +206,7 @@ class DutchIS extends Server
         $vCores = isset($configurableOptions['vcores']) ? $configurableOptions['vcores'] : $params['vcores'];
         $memory = isset($configurableOptions['memory']) ? $configurableOptions['memory'] : $params['memory'];
         $network = isset($configurableOptions['network']) ? $configurableOptions['network'] : $params['network'];
+        $billing = isset($configurableOptions['billing']) ? $configurableOptions['billing'] : $params['billing'];
 
         $response = $this->dutchisRequest("POST", "/api/v1/virtualservers", [
             'json' => [
@@ -207,6 +215,7 @@ class DutchIS extends Server
                 "hostname" => $params['config']['hostname'],
                 "username" => $params['config']['username'],
                 "password" => $params['config']['password'],
+                "billing_type" => $billing,
 
                 "disk" => $storage,
                 "class" => $class,
